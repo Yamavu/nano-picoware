@@ -24,7 +24,7 @@ ALT_CODES = {
 }
 
 def main(stdscr, filename: Optional[Path]):
-    curses.curs_set(0)
+    curses.curs_set(True) # use system cursor
     curses.noecho()
     curses.cbreak()
     stdscr.keypad(True)
@@ -35,10 +35,13 @@ def main(stdscr, filename: Optional[Path]):
     editor = Editor(
         lines_s,
     )
-    while True:
-        editor.draw(stdscr)
-        key = stdscr.getch()
-        editor.handle_key(key)
+    try:
+        while True:
+            editor.draw(stdscr)
+            key = stdscr.getch()
+            editor.handle_key(key)
+    finally:
+        curses.cbreak(False)
 
 
 if __name__ == "__main__":

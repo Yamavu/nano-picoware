@@ -7,51 +7,53 @@ from controls import Controls
 from buffer import Buffer
 
 class Editor:
-    def __init__(self, lines_s: list[str]):
+    def __init__(self, lines: list[str]):
         self.cursor = Cursor(0, 0)
         self.controls = Controls()
-        self.keymap_cursor = {
+        self.buffer = Buffer()
+        if lines is not None:
+            self.buffer.lines = lines
+        self.keymap_buffer = {
             self.controls.left: self.cursor.move_left,
             self.controls.right: self.cursor.move_right,
             self.controls.up: self.cursor.move_down,
             self.controls.down: self.cursor.move_down,
         }
-        self.keymap = {
-            self.controls.qkey: self.quit,
-            self.controls.skey: self.save_file,
-            self.controls.enterkey: self.newline,
-            self.controls.bspkey: self.backspace,
+        self.keymap_cursor = {
+            self.controls.enterkey: self.buffer.newline,
+            self.controls.bspkey: self.buffer.backspace,
         }
-        if lines_s is None:
-            self.lines_s = [""]
-        self.lines_s = lines_s
-
+        self.keymap = {
+            #self.controls.qkey: self.quit,
+            #self.controls.skey: self.save_file,
+        }
     def quit():
         pass
 
-    
-
     def handle_key(self, key):
-        if key in self.keymap_cursor:
-            self.keymap_cursor[key](self.lines_s)
-        if key in self.keymap:
+        if key in self.keymap_buffer:
+            self.keymap_buffer[key](self.lines_s)
+        elif key in self.keymap_cursor:
+            self.keymap_cursor[key](self.cursor)
+        elif key in self.keymap:
                 self.keymap[key]()
         elif 32 <= key <= 126:
-            self.buffer.insert_char(self.cursor.col, self.cursor.row, key)
+            self.cursor = self.buffer.insert_char(self.cursor, chr(key))
         else:
             raise ValueError(key)
 
     def draw(self, stdscr: curses.window):
+        # start_col, start_row # upper left corner of the displayed data
         stdscr.clear()
-        cursor = self.cursor
-        for i, line in enumerate(self.lines_s):
-            line_str = "".join(line)
-            if i == cursor.row:
-                display_line = line_str[: cursor.col] + "|" + line_str[cursor.col :]
-            else:
-                display_line = line_str
-            stdscr.addstr(i, 0, f"{i + 1} | {display_line}")
-        stdscr.move(cursor.row, cursor.col)
+        col, row = self.cursor.pos
+        for i, line in enumerate(self.buffer.lines):
+            if i > curses.LINES:
+                break
+            display_line = "".join(line[0:curses.COLS])
+            #if i == row: # only if system cursor is unavailable
+            #    display_line = display_line[: col] + "|" + display_line[col:] 
+            stdscr.addstr(i, 0, display_line)
+        stdscr.move(row, col) # mmove cursor position
         stdscr.refresh()
 
     def save_file(self, filename):

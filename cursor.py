@@ -1,7 +1,17 @@
+
+
 class Cursor:
     def __init__(self, row: int | None, col: int | None):
-        self.row = row
-        self.col = col
+        if row is None:
+            row = 0
+        if col is None:
+            col = 0
+        self.row:int = row
+        self.col:int = col
+
+    @property
+    def pos(self) -> tuple[int, int]:
+        return (self.col, self.row)
 
     def move_left(self, lines_s):
         if self.col > 0:

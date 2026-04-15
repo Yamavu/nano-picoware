@@ -1,32 +1,37 @@
 from cursor import Cursor
+import curses
 
 class Buffer:
     def __init__(self):
-        self.lines = [""]
+        self.lines: list[list[str]] = [[]]
 
-    def insert_char(self, col, row, char):
+    def insert_char(self, cursor:Cursor, char:str) -> Cursor:
+        col, row = cursor.pos
         line = self.lines[row]
-        self.lines[row] = line[:col] + char + line[col:]
-        return col + 1, row
+        self.lines[row] = line[:col] + [char] + line[col:]
+        cursor.col += 1
+        return cursor
 
-    def newline(self, col, row):
+    def newline(self, cursor:Cursor) -> Cursor:
+        col, row = cursor.pos
         line = self.lines[row]
         self.lines[row] = line[:col]
         self.lines.insert(row + 1, line[col:])
-        return 0, row + 1
+        cursor.row += 1
+        cursor.col = 0
+        return cursor
 
-    def draw(self, start_col, start_row):
-        pass
-
-    def backspace(self, x, y):
-        if x > 0:
-            line = self.lines[y]
-            self.lines[y] = line[:x - 1] + line[x:]
-            return x - 1, y
-        elif y > 0:
-            prev_len = len(self.lines[y - 1])
-            self.lines[y - 1] += self.lines[y]
-            del self.lines[y]
-            return prev_len, y - 1
-        return x, y
+    def backspace(self, cursor: Cursor):
+        col, row = cursor.pos
+        if col > 0:
+            line = self.lines[row]
+            self.lines[row] = line[:col - 1] + line[col:]
+            cursor.col -= 1
+        elif row > 0:
+            prev_len = len(self.lines[row - 1])
+            self.lines[row - 1] += self.lines[row]
+            del self.lines[row]
+            cursor.col = prev_len
+            cursor.row -= 1
+        return cursor
     

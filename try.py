@@ -4,9 +4,11 @@ def main(stdscr):
     # Clear screen and hide the cursor
     curses.curs_set(0)
     stdscr.clear()
+    stdscr.keypad(True)
 
     stdscr.addstr(0, 0, "Press any key combination (e.g., Ctrl+X):")
     stdscr.refresh()
+    stdscr.nodelay(False)
 
     # Get the input key code
     key = stdscr.getch()
@@ -21,6 +23,14 @@ def main(stdscr):
         result = f"Ctrl+{char}"
     elif key == 27:
         result = "Escape"
+        stdscr.timeout(100)
+        next_key = stdscr.getch()
+        if next_key != -1:
+            # If a key followed ESC immediately, it's likely an Alt combo
+            result = f"Alt+{chr(next_key).upper()}"
+        else:
+            result = "Escape"
+
     else:
         try:
             result = chr(key)

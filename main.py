@@ -5,23 +5,7 @@ import curses
 
 from editor import Editor
 
-TITLE = "nano 0.0.1"
-NO_FILE = "new buffer"
 
-ALT_CODES = {
-    "G":  "Help",
-    "X":  "Close",
-    "O":  "Save",
-    "R":  "Read",
-    "W":  "Search",
-    "\\": "Replace",
-    "K":  "Cut",
-    "U":  "Paste",
-    "T":  "Launch",
-    "J":  "Align",
-    "C":  "Position",
-    "/":  "Goto"
-}
 
 def main(stdscr, filename: Optional[Path]):
     curses.curs_set(True) # use system cursor

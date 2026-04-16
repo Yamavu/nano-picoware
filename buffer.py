@@ -1,37 +1,34 @@
-from cursor import Cursor
-import curses
+from pathlib import Path
+
 
 class Buffer:
     def __init__(self):
-        self.lines: list[list[str]] = [[]]
+        self.lines = [bytearray()]
 
-    def insert_char(self, cursor:Cursor, char:str) -> Cursor:
-        col, row = cursor.pos
-        line = self.lines[row]
-        self.lines[row] = line[:col] + [char] + line[col:]
-        cursor.col += 1
-        return cursor
+    def load(self, path: Path):
+        try:
+            # TODO: handle encodings
+            with open(path, "r", encoding="utf-8") as f:
+                lines_s = [list(line.rstrip("\n")) for line in f.readlines()]
+        except IOError | FileNotFoundError:
+            # TODO: error message
+            lines_s = [""]
+        self.lines = lines_s
 
-    def newline(self, cursor:Cursor) -> Cursor:
-        col, row = cursor.pos
-        line = self.lines[row]
-        self.lines[row] = line[:col]
-        self.lines.insert(row + 1, line[col:])
-        cursor.row += 1
-        cursor.col = 0
-        return cursor
+    def save(self, path: Path):
+        pass
 
-    def backspace(self, cursor: Cursor):
-        col, row = cursor.pos
-        if col > 0:
-            line = self.lines[row]
-            self.lines[row] = line[:col - 1] + line[col:]
-            cursor.col -= 1
-        elif row > 0:
-            prev_len = len(self.lines[row - 1])
-            self.lines[row - 1] += self.lines[row]
-            del self.lines[row]
-            cursor.col = prev_len
-            cursor.row -= 1
-        return cursor
-    
+    def draw_line(self, row: int, start: int, max_length: int) -> str:
+        if row < 0 or row >= len(self.lines):
+            return ""
+        line:bytearray = self.lines[row]
+        if start < 0:
+            start = 0
+        if start >= len(line):
+            return ""
+
+        # Slice visible part
+        visible = line[start:start + max_length]
+
+        # Convert to string
+        return visible.decode(errors="ignore")

@@ -1,7 +1,7 @@
 
 
 class Cursor:
-    def __init__(self, row: int | None, col: int | None):
+    def __init__(self, row: int, col: int):
         if row is None:
             row = 0
         if col is None:

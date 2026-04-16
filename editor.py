@@ -5,13 +5,15 @@ import curses
 from cursor import Cursor
 from controls import Controls
 from buffer import Buffer
+from command_manager import CommandManager
+from command import Newline, Backspace, InsertChar
 
 class Editor:
-    def __init__(self, lines: list[list[str]]):
+    def __init__(self):
         self.cursor = Cursor(0, 0)
         self.buffer = Buffer()
-        if lines is not None:
-            self.buffer.lines = lines
+        self.commands = CommandManager()
+
         self.keymap_buffer = {
             Controls.LEFT: self.cursor.move_left,
             Controls.RIGHT: self.cursor.move_right,
@@ -19,8 +21,8 @@ class Editor:
             Controls.DOWN: self.cursor.move_down,
         }
         self.keymap_cursor = {
-            Controls.ENTERKEY: self.buffer.newline,
-            Controls.BSPKEY: self.buffer.backspace,
+            Controls.ENTERKEY: Newline,
+            Controls.BSPKEY: Backspace,
         }
         self.keymap = {
             #Controls.qkey: self.quit,
@@ -33,11 +35,12 @@ class Editor:
         if key in self.keymap_buffer:
             self.keymap_buffer[key](self.buffer.lines)
         elif key in self.keymap_cursor:
+            self.cursor = self.commands.execute
             self.keymap_cursor[key](self.cursor)
         elif key in self.keymap:
                 self.keymap[key]()
         elif 32 <= key <= 126:
-            self.cursor = self.buffer.insert_char(self.cursor, chr(key))
+            self.cursor = self.commands.execute(InsertChar(chr(key)),self)
         else:
             raise ValueError(key)
 
@@ -62,11 +65,4 @@ class Editor:
 
     @staticmethod
     def load_file(filename: Path) -> list[str]:
-        try:
-            # TODO: handle encodings
-            with open(filename, "r", encoding="utf-8") as f:
-                lines_s = [list(line.rstrip("\n")) for line in f.readlines()]
-        except IOError | FileNotFoundError:
-            # TODO: error message
-            lines_s = [""]
-        return lines_s
+        

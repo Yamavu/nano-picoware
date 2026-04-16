@@ -7,32 +7,31 @@ from controls import Controls
 from buffer import Buffer
 
 class Editor:
-    def __init__(self, lines: list[str]):
+    def __init__(self, lines: list[list[str]]):
         self.cursor = Cursor(0, 0)
-        self.controls = Controls()
         self.buffer = Buffer()
         if lines is not None:
             self.buffer.lines = lines
         self.keymap_buffer = {
-            self.controls.left: self.cursor.move_left,
-            self.controls.right: self.cursor.move_right,
-            self.controls.up: self.cursor.move_down,
-            self.controls.down: self.cursor.move_down,
+            Controls.LEFT: self.cursor.move_left,
+            Controls.RIGHT: self.cursor.move_right,
+            Controls.UP: self.cursor.move_down,
+            Controls.DOWN: self.cursor.move_down,
         }
         self.keymap_cursor = {
-            self.controls.enterkey: self.buffer.newline,
-            self.controls.bspkey: self.buffer.backspace,
+            Controls.ENTERKEY: self.buffer.newline,
+            Controls.BSPKEY: self.buffer.backspace,
         }
         self.keymap = {
-            #self.controls.qkey: self.quit,
-            #self.controls.skey: self.save_file,
+            #Controls.qkey: self.quit,
+            #Controls.skey: self.save_file,
         }
     def quit():
         pass
 
     def handle_key(self, key):
         if key in self.keymap_buffer:
-            self.keymap_buffer[key](self.lines_s)
+            self.keymap_buffer[key](self.buffer.lines)
         elif key in self.keymap_cursor:
             self.keymap_cursor[key](self.cursor)
         elif key in self.keymap:
@@ -58,7 +57,7 @@ class Editor:
 
     def save_file(self, filename):
         with open(filename, "w") as f:
-            for line in self.lines_s:
+            for line in self.buffer.lines:
                 f.write("".join(line) + "\n")
 
     @staticmethod

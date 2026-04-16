@@ -26,9 +26,5 @@ class Buffer:
             start = 0
         if start >= len(line):
             return ""
-
-        # Slice visible part
         visible = line[start:start + max_length]
-
-        # Convert to string
         return visible.decode(errors="ignore")

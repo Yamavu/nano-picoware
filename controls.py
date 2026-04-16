@@ -1,5 +1,4 @@
 import curses
-from typing import Any
 
 class Controls:
     LEFT = curses.KEY_LEFT

@@ -1,5 +1,5 @@
 import curses
-import math
+#import math
 from controls import CONTROLS_STRG
 # M-* means Alt+*
 # ^*  means Strg+*

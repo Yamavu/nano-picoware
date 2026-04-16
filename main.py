@@ -11,14 +11,10 @@ def main(stdscr, filename: Optional[Path]):
     curses.curs_set(True) # use system cursor
     curses.noecho()
     curses.cbreak()
-    stdscr.keypad(True)
+    #stdscr.keypad()
+    editor = Editor()
     if filename is not None and filename.exists():
-        lines_s = Editor.load_file(filename)
-    else:
-        lines_s = [[]]
-    editor = Editor(
-        lines_s,
-    )
+        editor.load_file(filename)
     try:
         while True:
             editor.draw(stdscr)
@@ -26,6 +22,7 @@ def main(stdscr, filename: Optional[Path]):
             editor.handle_key(key)
     finally:
         curses.cbreak(False)
+        curses.echo()
 
 
 if __name__ == "__main__":

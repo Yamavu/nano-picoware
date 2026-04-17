@@ -1,33 +1,47 @@
 import curses
 
+
+def Strg(char: str) -> int:
+    """return key value for Strg+char"""
+    return ord(char) - 64
+
+
+def unStrg(key: int) -> str:
+    return chr(key + 64)
+
+
 class Controls:
     LEFT = curses.KEY_LEFT
     RIGHT = curses.KEY_RIGHT
     UP = curses.KEY_UP
     DOWN = curses.KEY_DOWN
-    IKEY = ord("i")
-    QKEY = ord("q")
-    SKEY = ord("s")
     ESCKEY = 27
     BSPKEY = curses.KEY_BACKSPACE
     ENTERKEY = 10
+    HELP = Strg("H")
+    CLOSE = Strg("X")
+    SAVE = Strg("O")
+    READ = Strg("R")
+    SEARCH = Strg("W")
+    REPLACE = Strg("E")
+    CUT = Strg("K")
+    PASTE = Strg("U")
+    LAUNCH = Strg("T")
+    ALIGN = Strg("J")
+    POSITION = Strg("C")
+    GOTO = Strg("G")
 
 
-class CONTROLS_STRG:
-    HELP = ord("G")-64
-    CLOSE = ord("X")-64
-    SAVE = ord("O")-64
-    READ = ord("R")-64
-    SEARCH = ord("W")-64
-    REPLACE = ord("\\")-64
-    CUT = ord("K")-64
-    PASTE = ord("U")-64
-    LAUNCH = ord("T")-64
-    ALIGN = ord("J")-64
-    POSITION = ord("C")-64
-    GOTO = ord("/")-64
+OPTIONS: list[tuple[str, str]] = [
+    (f"^{unStrg(Controls.HELP)}", "Help"),
+    (f"^{unStrg(Controls.CLOSE)}", "Close"),
+    (f"^{unStrg(Controls.SAVE)}", "Save"),
+    (f"^{unStrg(Controls.SEARCH)}", "Search"),
+    (f"^{unStrg(Controls.CUT)}", "Cut"),
+    (f"^{unStrg(Controls.PASTE)}", "Paste"),
+]
 
 
-class CONTROLS_ALT:
+class Controls_Alt:
     UNDO = ord("u")
     REDO = ord("e")

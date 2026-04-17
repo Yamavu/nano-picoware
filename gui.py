@@ -1,13 +1,13 @@
 import curses
-#import math
-from controls import CONTROLS_STRG
+from controls import OPTIONS
+from buffer import Buffer
 # M-* means Alt+*
 # ^*  means Strg+*
 
 TITLE = "nano 0.1.0"
 NO_FILE = "new buffer"
 
-def print_header(stdscr: curses.window, text:str | None = None):
+def header(stdscr: curses.window, text:str | None = None):
     if text is None:
         text = ""
     row = 0
@@ -18,25 +18,26 @@ def print_header(stdscr: curses.window, text:str | None = None):
     stdscr.refresh()
 
 
-def print_footer(stdscr: curses.window):
-    options:list[tuple[str, str]] = [
-        (f"^{chr(CONTROLS_STRG.HELP + 64)}", "Help"),
-        (f"^{chr(CONTROLS_STRG.CLOSE + 64)}", "Close"),
-        (f"^{chr(CONTROLS_STRG.SAVE + 64)}", "Save"),
-        (f"^{chr(CONTROLS_STRG.SEARCH + 64)}", "Search"),
-        (f"^{chr(CONTROLS_STRG.CUT + 64)}", "Cut"),
-        (f"^{chr(CONTROLS_STRG.PASTE + 64)}", "Paste")
-    ]
+def footer(stdscr: curses.window):
     window_height, window_width = stdscr.getmaxyx()
     col_width = 10
     footer_row = window_height - 1
     x_pos = 0
-    for i, (shortcut, label) in enumerate(options):
+    for i, (shortcut, label) in enumerate(OPTIONS):
         x_pos = col_width * i
         #assert len(shortcut) + len(label) + 3 < col_width, f"option string too large (> {col_width})"
         stdscr.addstr(footer_row, x_pos, shortcut, curses.A_REVERSE)
         stdscr.addnstr(footer_row, x_pos + len(shortcut) , f" {label}  ", 12)
     stdscr.refresh()
+
+def draw_textbox(stdscr: curses.window, buffer: Buffer, rows: tuple[int,int], cols:tuple[int,int], cursor_pos: tuple[int,int]):
+    row_start, row_end = rows
+    col_start, col_end = cols
+    for i in range(row_start, row_end+1):
+        display_line = buffer.draw_line(i, col_start, col_end)
+        #if i == row: # only if system cursor is unavailable
+        #    display_line = display_line[: col] + "|" + display_line[col:] 
+        stdscr.addstr(i, 0, display_line)
 
 def main():
     def launch(stdscr):
@@ -45,8 +46,8 @@ def main():
         curses.noecho()
         stdscr.clear()
         try:
-            print_header(stdscr, TITLE)
-            print_footer(stdscr)
+            header(stdscr, TITLE)
+            footer(stdscr)
         except curses.error as e:
             print("curses", e)
         except Exception as e:

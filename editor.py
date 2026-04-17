@@ -7,7 +7,7 @@ from controls import Controls
 from buffer import Buffer
 from command_manager import CommandManager
 from command import Newline, Backspace, InsertChar, MoveDown, MoveLeft, MoveRight, MoveUp
-
+from gui import header, footer, TITLE
 class Editor:
     def __init__(self):
         self.buffer = Buffer()
@@ -42,14 +42,16 @@ class Editor:
             raise ValueError("Why is cursor None?")
         col, row = self.cursor.pos
         max_rows, max_cols = stdscr.getmaxyx()
+        header(stdscr ,TITLE)
         for i, line in enumerate(self.buffer.lines):
-            if i > max_rows:
+            if i > max_rows-3:
                 break
             display_line = self.buffer.draw_line(i, 0, max_cols)
             #if i == row: # only if system cursor is unavailable
             #    display_line = display_line[: col] + "|" + display_line[col:] 
             stdscr.addstr(i, 0, display_line)
-        stdscr.move(row, col) # mmove cursor position
+        footer(stdscr)
+        stdscr.move(row, col) # move cursor position   
         stdscr.refresh()
 
     def save_file(self, filename):
@@ -60,5 +62,5 @@ class Editor:
     def load_file(self, filename: Path) -> list[str]:
         with open(filename, "w") as f:
             for line in f.readlines():
-                self.buffer.lines.apend(line.encode(encoding="utf-8"))
+                self.buffer.lines.append(line.encode(encoding="utf-8"))
         

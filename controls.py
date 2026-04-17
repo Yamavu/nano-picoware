@@ -37,9 +37,9 @@ OPTIONS: list[tuple[str, str]] = [
     (f"^{unStrg(Controls.HELP)}", "Help"),
     (f"^{unStrg(Controls.CLOSE)}", "Close"),
     (f"^{unStrg(Controls.SAVE)}", "Save"),
-    (f"^{unStrg(Controls.SEARCH)}", "Search"),
-    (f"^{unStrg(Controls.CUT)}", "Cut"),
-    (f"^{unStrg(Controls.PASTE)}", "Paste"),
+    #(f"^{unStrg(Controls.SEARCH)}", "Search"),
+    #(f"^{unStrg(Controls.CUT)}", "Cut"),
+    #(f"^{unStrg(Controls.PASTE)}", "Paste"),
 ]
 
 

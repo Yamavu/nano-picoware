@@ -7,13 +7,15 @@ from controls import Controls
 from buffer import Buffer
 from command_manager import CommandManager
 from command import Newline, Backspace, InsertChar, MoveDown, MoveLeft, MoveRight, MoveUp, Quit
-from gui import header, footer, TITLE
+from gui import Renderer, TITLE
+
 class Editor:
-    def __init__(self):
+    def __init__(self, stdscr: curses.window):
         self.running = True
         self.buffer = Buffer()
         self.cursor = Cursor(0, 0)
         self.commands = CommandManager()
+        self.renderer = Renderer(stdscr)
 
         self.keymap = {
             Controls.LEFT: MoveLeft,
@@ -50,7 +52,7 @@ class Editor:
             raise ValueError("Why is cursor None?")
         col, row = self.cursor.pos
         max_rows, max_cols = stdscr.getmaxyx()
-        header(stdscr ,TITLE)
+        self.renderer.header(stdscr ,TITLE)
         for i, line in enumerate(self.buffer.lines):
             if i > max_rows-3:
                 break
@@ -58,7 +60,7 @@ class Editor:
             #if i == row: # only if system cursor is unavailable
             #    display_line = display_line[: col] + "|" + display_line[col:] 
             stdscr.addstr(i, 0, display_line)
-        footer(stdscr)
+        self.renderer.footer(stdscr)
         stdscr.move(row, col) # move cursor position   
         stdscr.refresh()
 

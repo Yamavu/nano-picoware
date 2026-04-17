@@ -12,12 +12,12 @@ def main(stdscr, filename: Optional[Path]):
     curses.noecho()
     curses.cbreak()
     #stdscr.keypad()
-    editor = Editor()
+    editor = Editor(stdscr)
     if filename is not None and filename.exists():
         editor.load_file(filename)
     try:
         while editor.running:
-            editor.draw(stdscr)
+            editor.renderer.draw(editor.buffer, cursor_y=editor.cursor.row, cursor_x=editor.cursor.col)
             key = stdscr.getch()
             editor.handle_key(key)
     finally:

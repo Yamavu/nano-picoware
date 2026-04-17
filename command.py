@@ -28,8 +28,8 @@ class InsertChar(Command):
 
 class Backspace(Command):
     def __init__(self) -> None:
-        self.deleted = None
-        self.pos = None
+        self.deleted: bool | None = None
+        self.pos: tuple[int,int] | None = None
         self.merge = False
 
     def execute(self, editor):
@@ -48,6 +48,8 @@ class Backspace(Command):
             editor.cursor.row -= 1
 
     def undo(self, editor):
+        if self.pos is None:
+            raise ValueError("pos is None")
         col, row = self.pos
 
         if row > 0:
@@ -125,7 +127,7 @@ class MoveUp(Command):
             )
 
     def undo(self, editor):
-        MoveUp().execute()
+        MoveUp().execute(editor)
 
 
 class MoveDown(Command):
@@ -138,4 +140,11 @@ class MoveDown(Command):
             editor.cursor.col = min(editor.cursor.col, len(editor.buffer[editor.cursor.row]))
 
     def undo(self, editor):
-        MoveDown().execute()
+        MoveDown().execute(editor)
+
+class Quit(Command):
+    def __init__(self):
+        pass
+
+    def execute(self, editor):
+        editor.quit()

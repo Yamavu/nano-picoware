@@ -6,10 +6,11 @@ from cursor import Cursor
 from controls import Controls
 from buffer import Buffer
 from command_manager import CommandManager
-from command import Newline, Backspace, InsertChar, MoveDown, MoveLeft, MoveRight, MoveUp
+from command import Newline, Backspace, InsertChar, MoveDown, MoveLeft, MoveRight, MoveUp, Quit
 from gui import header, footer, TITLE
 class Editor:
     def __init__(self):
+        self.running = True
         self.buffer = Buffer()
         self.cursor = Cursor(0, 0)
         self.commands = CommandManager()
@@ -21,11 +22,10 @@ class Editor:
             Controls.DOWN: MoveDown,
             Controls.ENTERKEY: Newline,
             Controls.BSPKEY: Backspace,
+            Controls.CLOSE: Quit
             #Controls.qkey: self.quit,
             #Controls.skey: self.save_file,
         }
-    def quit():
-        pass
 
     def handle_key(self, key):
         if key in self.keymap:
@@ -34,6 +34,14 @@ class Editor:
             self.commands.execute(InsertChar(chr(key)), self)
         else:
             raise ValueError(key)
+
+    def quit(self):
+        self.running = False
+        del self.buffer
+        del self.cursor
+        del self.commands
+        del self.keymap
+
 
     def draw(self, stdscr: curses.window):
         # start_col, start_row # upper left corner of the displayed data
@@ -55,12 +63,7 @@ class Editor:
         stdscr.refresh()
 
     def save_file(self, filename):
-        with open(filename, "w") as f:
-            for line in self.buffer.lines:
-                f.write("".join(line) + "\n")
-
-    def load_file(self, filename: Path) -> list[str]:
-        with open(filename, "w") as f:
-            for line in f.readlines():
-                self.buffer.lines.append(line.encode(encoding="utf-8"))
+        self.buffer.save(filename)
         
+    def load_file(self, filename: Path):
+        self.buffer.load(filename)

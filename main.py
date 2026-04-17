@@ -16,7 +16,7 @@ def main(stdscr, filename: Optional[Path]):
     if filename is not None and filename.exists():
         editor.load_file(filename)
     try:
-        while True:
+        while editor.running:
             editor.draw(stdscr)
             key = stdscr.getch()
             editor.handle_key(key)

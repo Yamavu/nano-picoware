@@ -7,6 +7,7 @@ def Strg(char: str) -> int:
 
 
 def unStrg(key: int) -> str:
+    """revert Strg() and get the underlying character"""
     return chr(key + 64)
 
 
